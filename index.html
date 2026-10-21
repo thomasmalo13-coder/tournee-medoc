@@ -23,15 +23,36 @@ header{position:relative;z-index:1200;padding:8px 10px;padding-top:max(8px,env(s
 #se{display:block;font:800 40px/0.95 'Barlow Condensed';background:linear-gradient(90deg,#00f0ff,#ff2bd6 60%,#ff9f1c);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 12px rgba(255,43,214,.45))}
 #dep{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
 #dep input{height:38px;width:120px;border-radius:12px;border:1px solid rgba(0,240,255,.5);background:rgba(0,240,255,.08);color:#fff;font:700 20px 'Barlow Condensed';text-align:center;box-shadow:0 0 12px rgba(0,240,255,.25) inset;color-scheme:dark;padding:0 4px}
-#stats{display:flex;align-items:baseline;justify-content:center;gap:6px;margin-top:6px;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--bd);font-size:12px;color:var(--mu);white-space:nowrap}
+#stats{display:flex;align-items:baseline;justify-content:center;gap:5px;margin-top:5px;overflow:hidden;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--bd);font-size:12px;color:var(--mu);white-space:nowrap}
 #stats b{font:700 16px 'Barlow Condensed';color:var(--tx)}#stats i{font-style:normal;color:var(--mg)}
-.ctl{display:flex;gap:6px;margin-top:6px}
-.segw{display:flex;gap:2px;padding:3px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--bd)}
-#spd{flex:1 1 0;min-width:0}#seg{flex:0 0 auto}#seg button{flex:0 0 auto;padding:0 7px}
-.segw button{flex:1;min-width:0;height:34px;padding:0 2px;border:0;border-radius:11px;background:transparent;color:var(--mu);font:700 15px 'Barlow Condensed';letter-spacing:.3px;white-space:nowrap;transition:all .2s}
+.segw{display:flex;gap:4px;margin-top:5px;padding:3px;border-radius:13px;background:rgba(255,255,255,.05);border:1px solid var(--bd)}
+#seg button{flex:1 1 auto;padding:0 8px}
+.segw button{flex:1;min-width:0;height:30px;padding:0 4px;border:0;border-radius:10px;background:transparent;color:#d6d2f0;font:700 15px 'Barlow Condensed';letter-spacing:.4px;white-space:nowrap;transition:all .2s}
 #spd button.on{background:linear-gradient(135deg,#ff9f1c,#ff2bd6);color:#fff;box-shadow:0 0 14px rgba(255,43,214,.55)}
 #seg button.on{background:linear-gradient(135deg,#00f0ff,#7b5cff);color:#06101a;box-shadow:0 0 14px rgba(0,240,255,.5)}
-#spd .u{flex:none;align-self:center;font-size:9px;line-height:1;width:16px;text-align:center;color:var(--mu);padding:0}
+#spd .u{flex:none;align-self:center;font:700 10px 'Source Sans 3';letter-spacing:1px;text-transform:uppercase;color:var(--mu);padding:0 4px}
+#stats .tfx{color:#ff8fa8}#stats .tfx b{color:#ff6b8a}#stats small{font-size:10px;color:var(--mu)}
+#calc{display:none;color:var(--cy);animation:spin 1s linear infinite}#calc.on{display:inline-block}@keyframes spin{to{transform:rotate(360deg)}}
+#bpick2{position:relative;font-size:18px}#bpick2 sup{position:absolute;right:-4px;top:-5px;min-width:20px;height:18px;padding:0 4px;border-radius:9px;background:linear-gradient(135deg,#ff2bd6,#7b5cff);color:#fff;font:800 12px/18px 'Barlow Condensed';box-shadow:0 0 10px rgba(255,43,214,.6)}
+#set .sw{flex-direction:row;align-items:center;gap:8px;height:44px;padding:0 10px;border:1px solid var(--bd);border-radius:12px;background:rgba(255,255,255,.05);color:var(--tx);font-size:14px}
+#set .sw input{width:22px;height:22px;accent-color:#ff2bd6;padding:0}#set .rg input{width:150px;height:30px;padding:0;accent-color:#00f0ff;border:0;background:none}#set .rg b{color:var(--cy)}
+.tf{color:#ff6b8a;font-weight:700}
+.mk.cu{outline:3px solid #fff;outline-offset:2px;box-shadow:0 0 0 6px rgba(255,43,214,.45),0 0 18px var(--c)}
+.mkc{display:inline-flex;align-items:center;transform:translateX(-50%);padding:0 9px;border-radius:999px;background:rgba(11,9,24,.92);border:2px solid var(--c);color:#fff;font-family:'Barlow Condensed';font-weight:800;white-space:nowrap;box-shadow:0 0 12px var(--c);cursor:pointer}.mkc.cu{border-color:#fff}
+#list .pk{width:100%;margin-bottom:8px;border-color:rgba(255,43,214,.5);background:rgba(255,43,214,.12)}
+#pick{display:none;position:fixed;inset:0;z-index:3500;background:#0b0918;flex-direction:column}body.pk #pick{display:flex}
+#pick .ph{flex:none;padding:10px 12px;padding-top:max(10px,env(safe-area-inset-top));border-bottom:1px solid var(--bd);background:radial-gradient(120% 140% at 0% 0%,rgba(255,43,214,.2),transparent 55%),#0b0918}
+#pick .pt{display:flex;align-items:center;gap:8px}#pick .pt b{flex:1;font:800 24px 'Barlow Condensed';background:var(--gr);-webkit-background-clip:text;background-clip:text;color:transparent}#pick .pt span{font-size:12px;color:var(--mu)}
+#pq{width:100%;height:42px;margin-top:8px;border-radius:12px;border:1px solid rgba(0,240,255,.45);background:rgba(0,240,255,.06);color:#fff;font:600 16px 'Source Sans 3';padding:0 12px}
+#pick .pb{display:flex;gap:8px;margin-top:8px}#pick .pb .bt{flex:1;height:40px}#pyest{width:100%;height:40px;margin-top:8px;border-color:rgba(255,159,28,.5);background:rgba(255,159,28,.1);color:#ffc36b}
+#plist{flex:1;overflow-y:auto;padding:6px 10px 10px}.pg{margin-top:8px}
+.pgh{position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:8px;padding:8px 6px;background:#0b0918;font:800 17px 'Barlow Condensed';letter-spacing:.5px;color:var(--c)}.pgh i{width:14px;height:4px;border-radius:2px;background:var(--c);box-shadow:0 0 8px var(--c)}
+.pgh span{flex:1;color:var(--mu);font:600 13px 'Source Sans 3'}.pgh button{border:1px solid var(--bd);background:rgba(255,255,255,.05);color:var(--tx);border-radius:9px;height:28px;padding:0 10px;font:700 13px 'Barlow Condensed'}
+.pi{display:flex;align-items:center;gap:10px;padding:8px 10px;margin:4px 0;border-radius:14px;border:1px solid var(--bd);background:rgba(255,255,255,.03);opacity:.6;transition:all .15s}.pi.on{opacity:1;background:rgba(0,240,255,.07);border-color:rgba(0,240,255,.3)}
+.pi input{flex:none;width:24px;height:24px;accent-color:#00f0ff}.pi>b{flex:none;width:26px;font:800 16px 'Barlow Condensed';color:var(--mu)}.pi span{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.15}.pi span b{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pi small{color:var(--mu)}
+.pe{padding:30px;text-align:center;color:var(--mu)}
+#pick .pf{flex:none;padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom));border-top:1px solid var(--bd);background:#0b0918}#pgo{width:100%;border:0;cursor:pointer;font-size:21px}#pgo:disabled{opacity:.4;animation:none}
+@media (max-width:380px){#dep input{width:100px;font-size:19px}#se{font-size:36px}.ib{width:40px;height:40px}.segw button{font-size:14px}#seg button{padding:0 5px}}
 #set{display:none;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:flex-end}#set.on{display:flex;animation:fd .2s}#set label{font-size:12px;color:var(--mu);display:flex;flex-direction:column;gap:2px}
 #set input{background:rgba(255,255,255,.06);color:var(--tx);border:1px solid var(--bd);border-radius:12px;height:44px;font:700 18px 'Barlow Condensed';padding:0 10px;width:110px}
 .bt{height:46px;padding:0 14px;border-radius:14px;border:1px solid var(--bd);background:rgba(255,255,255,.07);color:var(--tx);font:700 16px 'Barlow Condensed';letter-spacing:.4px;transition:transform .15s}.bt:active{transform:scale(.95)}
@@ -85,12 +106,14 @@ header{position:relative;z-index:1200;padding:8px 10px;padding-top:max(8px,env(s
 #dl.on{display:block}#dl i{display:block;height:3px;margin-top:4px;border-radius:2px;background:var(--gr);width:0}
 </style></head><body class="locked"><div id="lock"><img src="icons/icon-192.png" alt=""><h2>Tournée Médoc</h2><p>Données protégées. Entrez le code d'accès (demandé une seule fois sur cet appareil).</p><input id="pin" type="password" autocomplete="current-password" placeholder="Code d'accès" enterkeyhint="go"><button class="wz" id="unl">Déverrouiller</button><div id="lerr"></div></div>
 <div id="app">
-<header><div class="top"><button class="ib" id="bl" aria-label="Liste">☰</button><div class="hero"><div class="lbl"><b>TFP</b> · Arrivée maison</div><b id="se">–</b></div><div id="dep"><span>Départ</span><input type="time" id="idep" value="01:30"></div><button class="ib" id="bs" aria-label="Réglages">⚙</button></div>
-<div id="stats"><span><b id="sk">–</b> km</span><i>·</i><span><b id="sd">–</b> route</span><i>·</i><span><b id="st">–</b> total</span></div>
-<div class="ctl"><div id="spd" class="segw"><button data-o="0">+0</button><button data-o="5">+5</button><button data-o="10">+10</button><button data-o="20">+20</button><button data-o="30">+30</button><span class="u">km/h</span></div><div id="seg" class="segw"><button data-m="medoc">Médoc↑Côte↓</button><button data-m="opt">Optimisé</button><button data-m="cur">Actuel</button></div></div>
-<div id="set"><label>Min par arrêt<input type="number" id="ist" min="0" step="0.5" value="4"></label><button class="bt" id="btile">Carte jour</button><button class="bt" id="bload">📦 Chargement</button><button class="bt" id="reset">Réinit. « fait »</button></div>
+<header><div class="top"><button class="ib" id="bl" aria-label="Liste">☰</button><div class="hero"><div class="lbl"><b>TFP</b> · Arrivée</div><b id="se">–</b></div><div id="dep"><span>Départ</span><input type="time" id="idep" value="01:30"></div><button class="ib" id="bpick2" aria-label="Pharmacies du soir">📋</button><button class="ib" id="bs" aria-label="Réglages">⚙</button></div>
+<div id="stats"><span><b id="sn">–</b> arrêts</span><i>·</i><span><b id="sk">–</b> km</span><i>·</i><span><b id="sd">–</b> route</span><span class="tfx" id="stf" style="display:none"><i>·</i> 🚦<b id="sx"></b> min <small>estim.</small></span><span id="calc">⟳</span></div>
+<div id="spd" class="segw"><span class="u">Vitesse</span><button data-o="0">+0</button><button data-o="5">+5</button><button data-o="10">+10</button><button data-o="20">+20</button><button data-o="30">+30</button><span class="u">km/h</span></div>
+<div id="seg" class="segw"><button data-m="best">⚡ Meilleur (trafic)</button><button data-m="medoc">Médoc↑Côte↓</button><button data-m="cur">Ordre actuel</button></div>
+<div id="set"><label>Min par arrêt<input type="number" id="ist" min="0" step="0.5" value="4"></label><label class="sw"><input type="checkbox" id="itr" checked>Trafic du matin (5h30)</label><label class="rg">Intensité : <b id="lint">normale</b><input type="range" id="iint" min="0" max="2" step="1" value="1"></label><button class="bt" id="bpick">📋 Pharmacies du soir</button><button class="bt" id="btile">Carte jour</button><button class="bt" id="bload">📦 Chargement</button><button class="bt" id="reset">Réinit. « fait »</button></div>
 </header>
 <div id="main"><div id="mw"><div id="map"></div><div id="dl">Téléchargement carte hors ligne <span id="dlp">0</span>%<i id="dlb"></i></div><div class="leg" id="leg"></div></div><div id="card"></div><div id="list"></div></div></div>
+<div id="pick"><div class="ph"><div class="pt"><b>📋 Pharmacies du soir</b><span id="pday"></span><button class="ib" id="pclose" aria-label="Fermer">✕</button></div><input id="pq" type="search" placeholder="Rechercher : nom, ville ou n°" autocomplete="off"><div class="pb"><button class="bt" id="pall">✓ Tout cocher</button><button class="bt" id="pnone">Tout décocher</button></div><button class="bt" id="pyest" style="display:none"></button></div><div id="plist"></div><div class="pf"><button class="wz" id="pgo">Calculer le meilleur tour</button></div></div>
 <div id="load"><div class="lh"><b>Ordre de chargement</b><span>Nom = étiquette de la caisse. Du haut vers le bas : à charger en premier (au fond) → en dernier (à la porte). Ordre : <b id="lmode"></b>.</span><button class="bt" onclick="print()">Imprimer</button><button class="bt" onclick="document.body.classList.remove('ld')">Fermer</button></div><div id="lbody"></div></div>
 <script src="vendor/leaflet.js"></script>
 <script src="vendor/protomaps-leaflet.js"></script>
