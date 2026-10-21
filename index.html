@@ -27,11 +27,11 @@ header{position:relative;z-index:1200;padding:8px 10px;padding-top:max(8px,env(s
 #stats b{font:700 16px 'Barlow Condensed';color:var(--tx)}#stats i{font-style:normal;color:var(--mg)}
 .ctl{display:flex;gap:6px;margin-top:6px}
 .segw{display:flex;gap:2px;padding:3px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--bd)}
-#spd{flex:5}#seg{flex:4}
+#spd{flex:1 1 0;min-width:0}#seg{flex:0 0 auto}#seg button{flex:0 0 auto;padding:0 7px}
 .segw button{flex:1;min-width:0;height:34px;padding:0 2px;border:0;border-radius:11px;background:transparent;color:var(--mu);font:700 15px 'Barlow Condensed';letter-spacing:.3px;white-space:nowrap;transition:all .2s}
 #spd button.on{background:linear-gradient(135deg,#ff9f1c,#ff2bd6);color:#fff;box-shadow:0 0 14px rgba(255,43,214,.55)}
 #seg button.on{background:linear-gradient(135deg,#00f0ff,#7b5cff);color:#06101a;box-shadow:0 0 14px rgba(0,240,255,.5)}
-#spd .u{flex:none;align-self:center;font-size:10px;color:var(--mu);padding:0 2px}
+#spd .u{flex:none;align-self:center;font-size:9px;line-height:1;width:16px;text-align:center;color:var(--mu);padding:0}
 #set{display:none;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:flex-end}#set.on{display:flex;animation:fd .2s}#set label{font-size:12px;color:var(--mu);display:flex;flex-direction:column;gap:2px}
 #set input{background:rgba(255,255,255,.06);color:var(--tx);border:1px solid var(--bd);border-radius:12px;height:44px;font:700 18px 'Barlow Condensed';padding:0 10px;width:110px}
 .bt{height:46px;padding:0 14px;border-radius:14px;border:1px solid var(--bd);background:rgba(255,255,255,.07);color:var(--tx);font:700 16px 'Barlow Condensed';letter-spacing:.4px;transition:transform .15s}.bt:active{transform:scale(.95)}
@@ -76,7 +76,7 @@ header{position:relative;z-index:1200;padding:8px 10px;padding-top:max(8px,env(s
 #load .lh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}#load .lh b{font:800 28px 'Barlow Condensed';flex:1 1 100%}#load .lh span{flex:1;font-size:13px;color:#555}#load .lh .bt{flex:0 0 auto;background:#f1f1f4;color:#000;border-color:#ddd}
 #load .r{display:flex;align-items:center;gap:12px;border-bottom:1px solid #e3e3e8;padding:10px 2px;break-inside:avoid}#load .r div{font-size:20px;line-height:1.15}#load .r small{font-size:16px;color:#444}
 #load .big{font:800 32px 'Barlow Condensed';letter-spacing:.5px}#load .lv{font-size:13px;color:#777}
-@media print{#load .lh .bt,#load .lh span{display:none}#load{position:static}}
+#load .lh span b{font:700 13px 'Source Sans 3';flex:none;color:#000}@media print{#load .lh .bt,#load .lh span{display:none}#load{position:static}}
 #lock{position:fixed;inset:0;z-index:5000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;background:radial-gradient(90% 60% at 20% 10%,rgba(255,43,214,.25),transparent),radial-gradient(90% 60% at 80% 90%,rgba(0,240,255,.2),transparent),#07060f;text-align:center}
 #lock img{width:96px;height:96px;border-radius:24px;box-shadow:0 0 30px rgba(255,43,214,.5)}#lock h2{margin:0;font:800 30px 'Barlow Condensed';background:var(--gr);-webkit-background-clip:text;background-clip:text;color:transparent}
 #lock p{margin:0;color:var(--mu);font-size:14px;max-width:320px}#lock input{width:100%;max-width:320px;height:56px;border-radius:16px;border:1px solid rgba(0,240,255,.5);background:rgba(0,240,255,.07);color:#fff;font:600 20px 'Source Sans 3';text-align:center}
@@ -87,11 +87,11 @@ header{position:relative;z-index:1200;padding:8px 10px;padding-top:max(8px,env(s
 <div id="app">
 <header><div class="top"><button class="ib" id="bl" aria-label="Liste">☰</button><div class="hero"><div class="lbl"><b>TFP</b> · Arrivée maison</div><b id="se">–</b></div><div id="dep"><span>Départ</span><input type="time" id="idep" value="01:30"></div><button class="ib" id="bs" aria-label="Réglages">⚙</button></div>
 <div id="stats"><span><b id="sk">–</b> km</span><i>·</i><span><b id="sd">–</b> route</span><i>·</i><span><b id="st">–</b> total</span></div>
-<div class="ctl"><div id="spd" class="segw"><button data-o="0">+0</button><button data-o="5">+5</button><button data-o="10">+10</button><button data-o="20">+20</button><button data-o="30">+30</button><span class="u">km/h</span></div><div id="seg" class="segw"><button data-m="opt">⚡ Optimisé</button><button data-m="cur">Ordre actuel</button></div></div>
+<div class="ctl"><div id="spd" class="segw"><button data-o="0">+0</button><button data-o="5">+5</button><button data-o="10">+10</button><button data-o="20">+20</button><button data-o="30">+30</button><span class="u">km/h</span></div><div id="seg" class="segw"><button data-m="medoc">Médoc↑Côte↓</button><button data-m="opt">Optimisé</button><button data-m="cur">Actuel</button></div></div>
 <div id="set"><label>Min par arrêt<input type="number" id="ist" min="0" step="0.5" value="4"></label><button class="bt" id="btile">Carte jour</button><button class="bt" id="bload">📦 Chargement</button><button class="bt" id="reset">Réinit. « fait »</button></div>
 </header>
 <div id="main"><div id="mw"><div id="map"></div><div id="dl">Téléchargement carte hors ligne <span id="dlp">0</span>%<i id="dlb"></i></div><div class="leg" id="leg"></div></div><div id="card"></div><div id="list"></div></div></div>
-<div id="load"><div class="lh"><b>Ordre de chargement</b><span>Nom = étiquette de la caisse. Du haut vers le bas : à charger en premier (au fond) → en dernier (à la porte). Ordre optimisé.</span><button class="bt" onclick="print()">Imprimer</button><button class="bt" onclick="document.body.classList.remove('ld')">Fermer</button></div><div id="lbody"></div></div>
+<div id="load"><div class="lh"><b>Ordre de chargement</b><span>Nom = étiquette de la caisse. Du haut vers le bas : à charger en premier (au fond) → en dernier (à la porte). Ordre : <b id="lmode"></b>.</span><button class="bt" onclick="print()">Imprimer</button><button class="bt" onclick="document.body.classList.remove('ld')">Fermer</button></div><div id="lbody"></div></div>
 <script src="vendor/leaflet.js"></script>
 <script src="vendor/protomaps-leaflet.js"></script>
 <script src="app.js"></script>

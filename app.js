@@ -1,7 +1,7 @@
 function start(D){
 const COL={"1er":"#00e5ff","2e":"#39ff88","3e":"#ffb020","4e":"#ff2bd6","5e":"#a66bff"};
 const P=D.P,LAST=P.length-1;
-const LS='tfp_medoc_';let mode=localStorage.getItem(LS+'mode')||'opt';let off=+(localStorage.getItem(LS+'off')||0);let night=localStorage.getItem(LS+'night')!=='0';
+const LS='tfp_medoc_';let mode=localStorage.getItem(LS+'mode2')||'medoc';if(!D.modes[mode])mode='medoc';let off=+(localStorage.getItem(LS+'off')||0);let night=localStorage.getItem(LS+'night')!=='0';
 let done=JSON.parse(localStorage.getItem(LS+'done')||'{}');let open=localStorage.getItem(LS+'card')==='1';
 const $=id=>document.getElementById(id);
 ['idep','ist'].forEach(k=>{const v=localStorage.getItem(LS+k);if(v!==null)$(k).value=v;$(k).addEventListener('input',()=>{localStorage.setItem(LS+k,$(k).value);calc();render()})});
@@ -19,7 +19,7 @@ const km=m=>(m/1000).toFixed(1).replace('.',',')+' km';
 const exact=(m,s)=>Math.round(m).toLocaleString('fr-FR')+' m · '+Math.floor(s/60)+' min '+Math.round(s%60)+' s';
 const wz=p=>`https://www.waze.com/ul?ll=${p.lat},${p.lon}&navigate=yes`;
 const gm=p=>`https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lon}&travelmode=driving`;
-const optNo={};D.modes.opt.seq.forEach((pi,k)=>{if(P[pi].num)optNo[P[pi].num]=k});
+const MN={medoc:'Médoc ↑ Côte ↓',opt:'Optimisé',cur:'Ordre actuel'};const rank=m=>{const r={};D.modes[m].seq.forEach((pi,k)=>{if(P[pi].num)r[P[pi].num]=k});return r};const refNo=rank('medoc');
 let T=[],LT=[],layer=L.layerGroup().addTo(map),markers={},cur=null;
 const avg=l=>l.ls>0?l.m/l.ls*3.6:0;
 const legT=l=>{if(!off||!(l.s>0))return l.s;const v=l.m/l.s*3.6+off;return l.m/(v/3.6)};
@@ -31,7 +31,7 @@ function label(k){return String(k).padStart(2,'0')}
 function legInfo(k){const l=D.modes[mode].legs[k-1];return `<div><b style="color:#00f0ff">Arrivée ${fmt(T[k])}</b> · trajet ${dur(LT[k-1])}</div><div class="rd">${l.r.join(' → ')}</div><div class="ex">${l.b?'Moy. autorisée':'Moy. (OSRM)'} ${Math.round(avg(l))} km/h · ${km(l.m)}</div>`}
 function popup(k){const M=D.modes[mode],p=P[M.seq[k]];
  if(!p.num)return `<div class="pp"><h3>${p.name}</h3><div class="mu">${p.addr}</div>${k==0?'<div>Départ '+fmt(T[0])+'</div>':legInfo(k)}<div class="row"><a class="wz" href="${wz(p)}">Waze</a></div></div>`;
- return `<div class="pp"><h3>${label(k)} · Pharmacie ${p.name}</h3><div class="mu">${p.town} · ${p.round} tour${mode=='cur'?' · opt. '+label(optNo[p.num]):''}</div>${p.approx?'<div class="ap">(position approximative)</div>':''}
+ return `<div class="pp"><h3>${label(k)} · Pharmacie ${p.name}</h3><div class="mu">${p.town} · ${p.round} tour${mode!='medoc'?' · M↑C↓ '+label(refNo[p.num]):''}</div>${p.approx?'<div class="ap">(position approximative)</div>':''}
  <div class="ins">${p.ins}</div>${legInfo(k)}
  <div class="row"><a class="wz" href="${wz(p)}">Waze — Y aller</a><button class="bt" onclick="tog('${p.num}')">${done[p.num]?'Annuler':'Fait ✓'}</button></div><a class="gm" href="${gm(p)}">Google Maps</a></div>`}
 function nextK(){const M=D.modes[mode];for(let k=1;k<LAST;k++)if(!done[P[M.seq[k]].num])return k;return LAST}
@@ -54,13 +54,13 @@ function go(k){$('list').classList.remove('on');cur=k;card();const p=P[D.modes[m
 function tog(n,adv){done[n]=!done[n];localStorage.setItem(LS+'done',JSON.stringify(done));map.closePopup();if(adv||done[n])cur=nextK();render()}
 function nx(){const M=D.modes[mode];let k=cur;do{k=k%LAST+1}while(k<LAST&&done[P[M.seq[k]].num]&&k!=cur);cur=k;card();const p=P[M.seq[k]];map.panTo([p.lat,p.lon])}
 const caps=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
-function loadView(){const s=D.modes.opt.seq.filter(pi=>P[pi].num).map(pi=>P[pi]).reverse();
- $('lbody').innerHTML=s.map(p=>`<div class="r"><div><b class="big">${caps(p.name)}</b><br><small>${p.town}</small> <span class="lv">livrée en ${optNo[p.num]}<sup>e</sup></span></div></div>`).join('');document.body.classList.add('ld')}
+function loadView(){const M=D.modes[mode],no=rank(mode),s=M.seq.filter(pi=>P[pi].num).map(pi=>P[pi]).reverse();$('lmode').textContent=MN[mode];
+ $('lbody').innerHTML=s.map(p=>`<div class="r"><div><b class="big">${caps(p.name)}</b><br><small>${p.town}</small> <span class="lv">livrée en ${no[p.num]}<sup>e</sup></span></div></div>`).join('');document.body.classList.add('ld')}
 $('bload').onclick=loadView;
 $('bl').onclick=()=>$('list').classList.toggle('on');$('bs').onclick=()=>$('set').classList.toggle('on');
 $('reset').onclick=()=>{if(confirm('Effacer les arrêts faits ?')){done={};localStorage.setItem(LS+'done','{}');cur=null;render()}};
 document.querySelectorAll('#spd button').forEach(b=>b.onclick=()=>{off=+b.dataset.o;localStorage.setItem(LS+'off',off);calc();render()});
-document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;localStorage.setItem(LS+'mode',mode);cur=null;calc();render()});
+document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;localStorage.setItem(LS+'mode2',mode);cur=null;calc();render()});
 Object.assign(window,{go,tog,nx,tgc,loadView,map});calc();render();map.fitBounds(L.latLngBounds(P.map(p=>[p.lat,p.lon])),{padding:[20,20]});
 }
 
@@ -78,7 +78,7 @@ async function offlineMap(){if(!('caches' in window))return;const c=await caches
  for(;;){const {done,value}=await rd.read();if(done)break;parts.push(value);got+=value.length;const p=Math.min(100,Math.floor(got*100/tot));$$('dlp').textContent=p;$$('dlb').style.width=p+'%'}
  await c.put('medoc.pmtiles',new Response(new Blob(parts),{headers:{'Content-Type':'application/octet-stream','Content-Length':String(got)}}));el.innerHTML='✓ Carte hors ligne prête';setTimeout(()=>el.classList.remove('on'),2500)}
  catch(e){el.textContent='Carte hors ligne : échec, réessai au prochain lancement';setTimeout(()=>el.classList.remove('on'),4000)}}
-document.documentElement.dataset.v='m3';
+document.documentElement.dataset.v='m4';
 function toast(t){let el=$$('upd');if(!el){el=document.createElement('div');el.id='upd';el.style.cssText="position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6000;padding:8px 18px;border-radius:999px;background:rgba(11,9,24,.92);border:1px solid rgba(255,43,214,.6);color:#ffd6f6;font:700 14px 'Source Sans 3',sans-serif;box-shadow:0 0 18px rgba(255,43,214,.55),0 0 6px rgba(0,240,255,.4) inset;white-space:nowrap";document.body.appendChild(el)}el.textContent=t;clearTimeout(el._t);el._t=setTimeout(()=>el.remove(),8000)}
 if('serviceWorker' in navigator){const sw=navigator.serviceWorker,hadCtl=!!sw.controller;let reloading=false;
  sw.addEventListener('controllerchange',()=>{if(!hadCtl||reloading||sessionStorage.getItem('tfp_rl')==='1')return;reloading=true;sessionStorage.setItem('tfp_rl','1');toast('Mise à jour…');setTimeout(()=>location.reload(),300)});
