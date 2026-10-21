@@ -78,4 +78,11 @@ async function offlineMap(){if(!('caches' in window))return;const c=await caches
  for(;;){const {done,value}=await rd.read();if(done)break;parts.push(value);got+=value.length;const p=Math.min(100,Math.floor(got*100/tot));$$('dlp').textContent=p;$$('dlb').style.width=p+'%'}
  await c.put('medoc.pmtiles',new Response(new Blob(parts),{headers:{'Content-Type':'application/octet-stream','Content-Length':String(got)}}));el.innerHTML='✓ Carte hors ligne prête';setTimeout(()=>el.classList.remove('on'),2500)}
  catch(e){el.textContent='Carte hors ligne : échec, réessai au prochain lancement';setTimeout(()=>el.classList.remove('on'),4000)}}
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+document.documentElement.dataset.v='m3';
+function toast(t){let el=$$('upd');if(!el){el=document.createElement('div');el.id='upd';el.style.cssText="position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6000;padding:8px 18px;border-radius:999px;background:rgba(11,9,24,.92);border:1px solid rgba(255,43,214,.6);color:#ffd6f6;font:700 14px 'Source Sans 3',sans-serif;box-shadow:0 0 18px rgba(255,43,214,.55),0 0 6px rgba(0,240,255,.4) inset;white-space:nowrap";document.body.appendChild(el)}el.textContent=t;clearTimeout(el._t);el._t=setTimeout(()=>el.remove(),8000)}
+if('serviceWorker' in navigator){const sw=navigator.serviceWorker,hadCtl=!!sw.controller;let reloading=false;
+ sw.addEventListener('controllerchange',()=>{if(!hadCtl||reloading||sessionStorage.getItem('tfp_rl')==='1')return;reloading=true;sessionStorage.setItem('tfp_rl','1');toast('Mise à jour…');setTimeout(()=>location.reload(),300)});
+ setTimeout(()=>sessionStorage.removeItem('tfp_rl'),10000);
+ sw.register('sw.js',{updateViaCache:'none'}).then(reg=>{const up=()=>reg.update().catch(()=>{});
+  reg.addEventListener('updatefound',()=>{if(hadCtl)toast('Mise à jour…')});
+  up();document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')up()})}).catch(()=>{})}
