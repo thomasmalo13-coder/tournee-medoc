@@ -2,7 +2,7 @@ function start(D){
 const COL={"1er":"#00e5ff","2e":"#39ff88","3e":"#ffb020","4e":"#ff2bd6","5e":"#a66bff"};
 const P=D.P,LAST=P.length-1;
 const LS='tfp_medoc_';let mode=localStorage.getItem(LS+'mode')||'opt';let off=+(localStorage.getItem(LS+'off')||0);let night=localStorage.getItem(LS+'night')!=='0';
-let done=JSON.parse(localStorage.getItem(LS+'done')||'{}');
+let done=JSON.parse(localStorage.getItem(LS+'done')||'{}');let open=localStorage.getItem(LS+'card')==='1';
 const $=id=>document.getElementById(id);
 ['idep','ist'].forEach(k=>{const v=localStorage.getItem(LS+k);if(v!==null)$(k).value=v;$(k).addEventListener('input',()=>{localStorage.setItem(LS+k,$(k).value);calc();render()})});
 const map=L.map('map',{zoomControl:false,preferCanvas:true,attributionControl:false});map.attributionControl=L.control.attribution({position:'topright',prefix:false}).addTo(map);
@@ -10,7 +10,9 @@ map.setMaxZoom(19);map.attributionControl.setPrefix(false);map.attributionContro
 function tiles(){if(base)map.removeLayer(base);base=protomapsL.leafletLayer({url:'medoc.pmtiles',flavor:night?'dark':'light',lang:'fr',maxDataZoom:14});base.addTo(map);$('btile').textContent=night?'☀ Carte jour':'🌙 Carte nuit'}
 $('btile').onclick=()=>{night=!night;localStorage.setItem(LS+'night',night?'1':'0');tiles()};tiles();
 map.on('popupopen',()=>$('leg').style.display='none');map.on('popupclose',()=>$('leg').style.display='');
-$('leg').innerHTML=Object.entries(COL).map(([k,c])=>`<div><i style="background:${c};color:${c}"></i>${k} tour</div>`).join('');
+const leg=$('leg');leg.innerHTML='<div class="lh">'+Object.values(COL).map(c=>`<i style="background:${c};color:${c}"></i>`).join('')+'Tours ▾</div><div class="lb">'+Object.entries(COL).map(([k,c])=>`<div><i style="background:${c};color:${c}"></i>${k} tour</div>`).join('')+'</div>';
+leg.classList.toggle('on',localStorage.getItem(LS+'leg')==='1');leg.onclick=()=>localStorage.setItem(LS+'leg',leg.classList.toggle('on')?'1':'0');
+if(window.ResizeObserver)new ResizeObserver(()=>map.invalidateSize({pan:false})).observe($('map'));
 const fmt=m=>{m=((Math.round(m)%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
 const dur=s=>{const m=Math.round(s/60);return m>=60?Math.floor(m/60)+' h '+String(m%60).padStart(2,'0'):m+' min'};
 const km=m=>(m/1000).toFixed(1).replace('.',',')+' km';
@@ -37,15 +39,18 @@ function render(){layer.clearLayers();markers={};const M=D.modes[mode];
  M.legs.forEach((l,k)=>{const p=P[M.seq[k+1]],c=p.round?COL[p.round]:'#c9c3ff';L.polyline(l.g,{color:c,weight:14,opacity:.22,interactive:false}).addTo(layer);L.polyline(l.g,{color:c,weight:4.5,opacity:1,interactive:false}).addTo(layer)});
  M.seq.forEach((pi,k)=>{const p=P[pi];let html;
   if(!p.num)html=`<div class="mk sq" style="--c:#ff2bd6">${k==0?'D':'🏠'}</div>`;else html=done[p.num]?`<div class="mk done">✓</div>`:`<div class="mk" style="background:${COL[p.round]};--c:${COL[p.round]};color:#07060f">${label(k)}</div>`;
-  markers[k]=L.marker([p.lat,p.lon],{icon:L.divIcon({html,className:'',iconSize:[32,32],iconAnchor:[16,16]}),zIndexOffset:p.num?0:1000}).bindPopup(()=>popup(k),{maxWidth:300,autoPanPaddingTopLeft:L.point(10,10),autoPanPaddingBottomRight:L.point(10,300)}).addTo(layer)});
+  markers[k]=L.marker([p.lat,p.lon],{icon:L.divIcon({html,className:'',iconSize:[32,32],iconAnchor:[16,16]}),zIndexOffset:p.num?0:1000}).bindPopup(()=>popup(k),{maxWidth:300,autoPanPaddingTopLeft:L.point(10,10),autoPanPaddingBottomRight:L.point(10,10)}).addTo(layer)});
  $('list').innerHTML=M.seq.map((pi,k)=>{const p=P[pi],c=p.round?COL[p.round]:'#ff2bd6';return `<div class="it${p.num&&done[p.num]?' done':''}" onclick="go(${k})"><div class="n" style="background:${c};--c:${c};color:#07060f">${p.num?(done[p.num]?'✓':label(k)):(k?'🏠':'D')}</div><div class="t"><b>${p.num?'Pharmacie '+p.name:p.name}</b><br><small>${p.town||p.addr}</small></div><div class="h">${fmt(T[k])}</div></div>`}).join('');
  if(cur===null||cur<1||cur>LAST||(P[M.seq[cur]].num&&done[P[M.seq[cur]].num]))cur=nextK();card();
  document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.m==mode));}
 function card(){const M=D.modes[mode],k=cur,p=P[M.seq[k]],nd=Object.keys(done).filter(x=>done[x]).length,l=M.legs[k-1],c=p.round?COL[p.round]:'#ff2bd6';
- $('card').innerHTML=`<div class="row" onclick="go(${k})"><div class="n" style="background:${c};--c:${c};color:#07060f;width:44px;height:44px;font-size:20px">${p.num?label(k):'🏠'}</div><div class="nm"><div class="kick">Prochain arrêt · ${nd}/${LAST-1} faits</div><div class="pn">${p.num?p.name:'Arrivée maison'}</div><div class="tw">${p.town||p.addr}</div></div><div class="eta"><b>${fmt(T[k])}</b><small>${dur(LT[k-1])}</small></div></div>
- ${p.num?`<div class="ins">${p.ins}</div>`:''}<div class="rd">${l.r.join(' → ')}</div>
- <div class="row" style="margin-top:10px"><a class="wz" href="${wz(p)}">➤ WAZE</a>${p.num?`<button class="bt ok" onclick="tog('${p.num}',1)">✓ Fait</button>`:''}<button class="bt" onclick="nx()">Suivant ›</button></div>`}
-function go(k){$('list').classList.remove('on');cur=k;card();const p=P[D.modes[mode].seq[k]];map.setView([p.lat,p.lon],16,{animate:false});map.panBy([0,Math.round($('card').offsetHeight/2)],{animate:false});setTimeout(()=>markers[k].openPopup(),250)}
+ $('card').classList.toggle('open',open);
+ $('card').innerHTML=`<div class="grip" onclick="tgc()" aria-label="Détails"><span></span>${open?'▾':'▴'}</div><div class="row"><div class="n" onclick="go(${k})" style="background:${c};--c:${c};color:#07060f">${p.num?label(k):'🏠'}</div><div class="nm" onclick="tgc()"><div class="pn">${p.num?p.name:'Arrivée maison'}</div><div class="sub"><b>${fmt(T[k])}</b> · ${dur(LT[k-1])}${open?'':' · '+(p.town||p.addr)}</div></div><a class="wz" href="${wz(p)}">➤ WAZE</a>${open?'':(p.num?`<button class="bt ok" onclick="tog('${p.num}',1)" aria-label="Fait">✓</button>`:'')+`<button class="bt" onclick="nx()" aria-label="Suivant">›</button>`}</div>
+ <div class="more"><div class="kick">Prochain arrêt · ${nd}/${LAST-1} faits · <em>${p.town||p.addr}</em></div>${p.num?`<div class="ins">${p.ins}</div>`:''}<div class="rd">${l.r.join(' → ')}</div>
+ <div class="row">${p.num?`<button class="bt ok" onclick="tog('${p.num}',1)">✓ Fait</button>`:''}<button class="bt" onclick="nx()">Suivant ›</button></div></div>`}
+function tgc(v){open=v===undefined?!open:v;localStorage.setItem(LS+'card',open?'1':'0');card()}
+{let y0=null;const el=$('card');el.addEventListener('touchstart',e=>{y0=e.touches[0].clientY},{passive:true});el.addEventListener('touchend',e=>{if(y0===null)return;const dy=e.changedTouches[0].clientY-y0;y0=null;if(dy<-35&&!open)tgc(true);else if(dy>35&&open)tgc(false)},{passive:true})}
+function go(k){$('list').classList.remove('on');cur=k;card();const p=P[D.modes[mode].seq[k]];map.setView([p.lat,p.lon],16,{animate:false});setTimeout(()=>markers[k].openPopup(),250)}
 function tog(n,adv){done[n]=!done[n];localStorage.setItem(LS+'done',JSON.stringify(done));map.closePopup();if(adv||done[n])cur=nextK();render()}
 function nx(){const M=D.modes[mode];let k=cur;do{k=k%LAST+1}while(k<LAST&&done[P[M.seq[k]].num]&&k!=cur);cur=k;card();const p=P[M.seq[k]];map.panTo([p.lat,p.lon])}
 const caps=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
@@ -56,7 +61,7 @@ $('bl').onclick=()=>$('list').classList.toggle('on');$('bs').onclick=()=>$('set'
 $('reset').onclick=()=>{if(confirm('Effacer les arrêts faits ?')){done={};localStorage.setItem(LS+'done','{}');cur=null;render()}};
 document.querySelectorAll('#spd button').forEach(b=>b.onclick=()=>{off=+b.dataset.o;localStorage.setItem(LS+'off',off);calc();render()});
 document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;localStorage.setItem(LS+'mode',mode);cur=null;calc();render()});
-Object.assign(window,{go,tog,nx,loadView});calc();render();map.fitBounds(L.latLngBounds(P.map(p=>[p.lat,p.lon])),{padding:[20,20]});
+Object.assign(window,{go,tog,nx,tgc,loadView,map});calc();render();map.fitBounds(L.latLngBounds(P.map(p=>[p.lat,p.lon])),{padding:[20,20]});
 }
 
 const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
