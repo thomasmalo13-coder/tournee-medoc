@@ -2,17 +2,19 @@
    Bandes : [début en minutes depuis 00:00, facteur appliqué à la durée OSRM du tronçon]
    Le facteur est lu à l'heure du milieu du tronçon. Intensité : l'excédent (facteur-1) est multiplié par 0,5 / 1 / 1,5. */
 const TRAFFIC={
- START:'05:30',
+ START:'04:00',   // calibré : Aurba 2022, TomTom 2025, Bordeaux Métropole ci_courb_a, DREAL (pas de données publiques 04:00–06:00 : estimation)
  // Zone « Bordeaux nord / rocade » : boîte lat/lon (Le Haillan, Eysines, Blanquefort, St-Médard, Le Taillan, St-Aubin, Bruges/Bordeaux) + tronçons empruntant la rocade A630/N230
  BN_BOX:{latMin:44.78,latMax:44.935,lonMin:-0.77,lonMax:-0.50},
- BN:[[0,1.0],[330,1.3],[390,1.6],[420,2.0],[570,1.4],[1200,1.0]],   // <05:30 ×1 · 05:30 ×1.3 · 06:30 ×1.6 · 07:00–09:30 ×2 · après ×1.4 · 20:00+ ×1
+ BN:[[0,1.0],[240,1.05],[330,1.10],[390,1.25],[420,1.45],[450,1.65],[540,1.45],[600,1.25],[750,1.15],[1200,1.0]],   // <04:00 ×1 · 04:00 ×1.05 · 05:30 ×1.1 · 06:30 ×1.25 · 07:00 ×1.45 · 07:30–09:00 ×1.65 · 09:00 ×1.45 · 10:00 ×1.25 · 12:30 ×1.15 · 20:00+ ×1
  // Descente du Médoc vers Bordeaux (couloir estuaire D2/D1215 Verdon → Lesparre → Castelnau) : arrivée plus au sud d'au moins 0,05° de latitude
  MS_DLAT:-0.05,
  MS_POLY:[[45.62,-1.13],[45.45,-1.06],[45.38,-1.02],[45.30,-0.98],[45.10,-0.90],[44.935,-0.88],[44.935,-0.50],[45.62,-0.50]],
- MS:[[0,1.0],[330,1.15],[390,1.3],[540,1.15],[1200,1.0]],          // <05:30 ×1 · 05:30 ×1.15 · 06:30–09:00 ×1.3 · après ×1.15
+ MS:[[0,1.0],[240,1.03],[330,1.05],[390,1.15],[420,1.25],[540,1.15],[600,1.05],[1200,1.0]],   // <04:00 ×1 · 04:00 ×1.03 · 05:30 ×1.05 · 06:30 ×1.15 · 07:00–09:00 ×1.25 · 09:00 ×1.15 · 10:00 ×1.05 · 20:00+ ×1
  INT:[0.5,1,1.5], INT_LBL:['faible','normale','forte'],
  BUDGET_MS:700   // temps max du solveur (téléphone)
 };
+// Ordre de référence « Meilleur (trafic) » pour les 42 (banlieue → estuaire ↑ → côte ↓ par Montalivet → Eysines) : graine du solveur
+const SEED_BEST='07,08,09,05,06,04,35,36,37,41,42,40,39,38,31,30,32,33,34,11,10,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,03,02,01'.split(',');
 const AREAS={bx:['Banlieue de Bordeaux','#00e5ff'],md:['Médoc estuaire','#39ff88'],ct:['Côte & forêt','#ffb020']};
 const COAST_NUMS=['23','24','25','26','27','28'],MONT_NUM='23';
 const MODES={best:'⚡ Meilleur (trafic)',medoc:'Médoc↑Côte↓',cur:'Ordre actuel'};
@@ -130,7 +132,7 @@ const depMin=()=>{const[h,mi]=($('idep').value||'01:30').split(':').map(Number);
 function Smat(){const S=new Float64Array(N*N);for(let k=0;k<N*N;k++){const s=D.dur[(k/N)|0][k%N],m=D.dist[(k/N)|0][k%N];S[k]=off&&s>0?m/((m/s*3.6+off)/3.6):s}return S}
 const CACHE=new Map();let calcT=null,lastKey='';
 function query(){const nodes=STOPS.filter(i=>sel.has(i)),q={S:Smat(),dep:depMin()*60,stop:(+$('ist').value||0)*60,tr,k:TRAFFIC.INT[ti],nodes,budget:TRAFFIC.BUDGET_MS,mode:mode==='cur'?'fixed':mode};
- if(mode!=='cur'){q.seeds=[D.seed.opt,D.seed.medoc].map(s=>s.filter(i=>sel.has(i)));
+ if(mode!=='cur'){q.seeds=[SEED_BEST.map(n=>idxOf[n]),D.seed.opt,D.seed.medoc].map(s=>s.filter(i=>sel.has(i)));
   // blocs de zones (dans l'ordre statique optimal) pour explorer « banlieue d'abord / à la fin »
   const o=D.seed.opt.filter(i=>sel.has(i)&&P[i].num),md=D.seed.medoc.filter(i=>sel.has(i)&&P[i].num);
   q.groups={bx:o.filter(i=>P[i].area==='bx'),est:md.filter(i=>P[i].area==='md'),cst:md.filter(i=>P[i].area==='ct')};
@@ -233,7 +235,7 @@ async function offlineMap(){if(!('caches' in window))return;const c=await caches
  for(;;){const {done,value}=await rd.read();if(done)break;parts.push(value);got+=value.length;const p=Math.min(100,Math.floor(got*100/tot));$$('dlp').textContent=p;$$('dlb').style.width=p+'%'}
  await c.put('medoc.pmtiles',new Response(new Blob(parts),{headers:{'Content-Type':'application/octet-stream','Content-Length':String(got)}}));el.innerHTML='✓ Carte hors ligne prête';setTimeout(()=>el.classList.remove('on'),2500)}
  catch(e){el.textContent='Carte hors ligne : échec, réessai au prochain lancement';setTimeout(()=>el.classList.remove('on'),4000)}}
-document.documentElement.dataset.v='m5';
+document.documentElement.dataset.v='m6';
 function toast(t){let el=$$('upd');if(!el){el=document.createElement('div');el.id='upd';el.style.cssText="position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6000;padding:8px 18px;border-radius:999px;background:rgba(11,9,24,.92);border:1px solid rgba(255,43,214,.6);color:#ffd6f6;font:700 14px 'Source Sans 3',sans-serif;box-shadow:0 0 18px rgba(255,43,214,.55),0 0 6px rgba(0,240,255,.4) inset;white-space:nowrap";document.body.appendChild(el)}el.textContent=t;clearTimeout(el._t);el._t=setTimeout(()=>el.remove(),8000)}
 if('serviceWorker' in navigator){const sw=navigator.serviceWorker,hadCtl=!!sw.controller;let reloading=false;
  sw.addEventListener('controllerchange',()=>{if(!hadCtl||reloading||sessionStorage.getItem('tfp_rl')==='1')return;reloading=true;sessionStorage.setItem('tfp_rl','1');toast('Mise à jour…');setTimeout(()=>location.reload(),300)});
